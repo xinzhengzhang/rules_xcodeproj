@@ -44,7 +44,11 @@ extension Target {
             resourceBundles: resourceBundles,
             inputs: inputs,
             links: links,
-            dependencies: dependencies
+            dependencies: dependencies,
+            outputs: Outputs(
+                dsyms: nil,
+                swiftModule: nil
+            )
         )
     }
 }
