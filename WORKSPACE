@@ -85,6 +85,7 @@ swift_library(
 # `xcodeproj_rules_dependencies()` since we need to load the bzl file, so if we
 # wanted to load it inside of a macro, it would need to be in a different file
 # to begin with.
+
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
@@ -133,3 +134,14 @@ load("@cgrindel_rules_bazel_integration_test//bazel_integration_test:defs.bzl", 
 load("//:bazel_versions.bzl", "SUPPORTED_BAZEL_VERSIONS")
 
 bazel_binaries(versions = SUPPORTED_BAZEL_VERSIONS)
+
+# API doc generation
+
+http_archive(
+    name = "io_bazel_stardoc",
+    sha256 = "f89bda7b6b696c777b5cf0ba66c80d5aa97a6701977d43789a9aee319eef71e8",
+    strip_prefix = "stardoc-d93ee5347e2d9c225ad315094507e018364d5a67",
+    urls = [
+        "https://github.com/bazelbuild/stardoc/archive/d93ee5347e2d9c225ad315094507e018364d5a67.tar.gz",
+    ],
+)
