@@ -18,6 +18,7 @@ load(":collections.bzl", "flatten", "set_if_true", "uniq")
 load(
     ":files.bzl",
     "file_path",
+    "file_path_to_dto",
     "join_paths_ignoring_empty",
     "parsed_file_path",
 )
@@ -299,9 +300,9 @@ def _xcode_target(
         test_host = test_host,
         build_settings = build_settings,
         search_paths = search_paths,
-        frameworks = frameworks,
-        modulemaps = modulemaps.file_paths,
-        swiftmodules = swiftmodules,
+        frameworks = [file_path_to_dto(fp) for fp in frameworks],
+        modulemaps = [file_path_to_dto(fp) for fp in modulemaps.file_paths],
+        swiftmodules = [file_path_to_dto(fp) for fp in swiftmodules],
         inputs = input_files.to_dto(inputs),
         links = links,
         dependencies = dependencies,
@@ -1006,7 +1007,7 @@ def _process_search_paths(
             search_paths,
             "framework_includes",
             [
-                parsed_file_path(path)
+                file_path_to_dto(parsed_file_path(path))
                 for path in compilation_context.framework_includes.to_list()
             ],
         )
@@ -1014,7 +1015,7 @@ def _process_search_paths(
             search_paths,
             "quote_includes",
             [
-                parsed_file_path(path)
+                file_path_to_dto(parsed_file_path(path))
                 for path in compilation_context.quote_includes.to_list() +
                             opts_search_paths.quote_includes
             ],
@@ -1023,7 +1024,7 @@ def _process_search_paths(
             search_paths,
             "includes",
             [
-                parsed_file_path(path)
+                file_path_to_dto(parsed_file_path(path))
                 for path in (compilation_context.includes.to_list() +
                              opts_search_paths.includes)
             ],
