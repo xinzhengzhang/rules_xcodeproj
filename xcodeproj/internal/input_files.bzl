@@ -105,6 +105,7 @@ def _collect(
         *,
         ctx,
         target,
+        attrs_info,
         owner,
         additional_files = [],
         transitive_infos):
@@ -116,6 +117,7 @@ def _collect(
         owner: An optional string that has a unique identifier for `target`, if
             it owns the resources. Only targets that become Xcode targets should
             own resources.
+        attrs_info: The `InputFileAttributesInfo` for the target.
         additional_files: A `list` of `File`s to add to the inputs. This can
             be used to add files to the `generated` and `extra_files` fields
             (e.g. modulemaps or BUILD files).
@@ -140,7 +142,6 @@ def _collect(
             catagories. This also includes files of transitive dependencies
             that didn't create an Xcode target.
     """
-    attrs_info = target[InputFileAttributesInfo]
     output_files = target.files.to_list()
 
     srcs = []
