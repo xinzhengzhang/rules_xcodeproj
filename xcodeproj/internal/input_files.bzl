@@ -5,6 +5,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":collections.bzl", "flatten", "set_if_true")
 load(":files.bzl", "file_path", "file_path_to_dto", "join_paths_ignoring_empty")
 load(":logging.bzl", "warn")
+load(":providers.bzl", "XcodeProjInfo")
 
 # Utility
 
@@ -205,6 +206,35 @@ def _collect(
         if _should_ignore_attr(attr, excluded_attrs = excluded_attrs):
             continue
         _handle_file(getattr(ctx.rule.file, attr), attr = attr)
+
+    for attr in dir(ctx.rule.attr):
+        if not attrs_info.resources.get(attr):
+            continue
+
+        dep = getattr(ctx.rule.attr, attr)
+        if not dep:
+            continue
+        if type(dep) == "list":
+            for dep in dep:
+                if AppleResourceBundleInfo in dep or AppleResourceInfo not in dep:
+                    continue
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = dep[XcodeProjInfo],
+                ):
+                    continue
+                print(target.label, attr, dep.label, dep[AppleResourceInfo])
+        else:
+            if AppleResourceBundleInfo in dep or AppleResourceInfo not in dep:
+                continue
+            if _should_include_transitive_resources(
+                attrs_info = attrs_info,
+                attr = attr,
+                info = dep[XcodeProjInfo],
+            ):
+                continue
+            print(target.label, attr, dep.label, dep[AppleResourceInfo])
 
     # Sanity check to insure that we are excluding files correctly
     suspect_files = [
