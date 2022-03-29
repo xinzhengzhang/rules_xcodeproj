@@ -1,10 +1,10 @@
 """Functions to deal with target input files."""
 
+load("@build_bazel_rules_apple//apple:providers.bzl", "AppleResourceBundleInfo", "AppleResourceInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":collections.bzl", "flatten", "set_if_true")
 load(":files.bzl", "file_path", "file_path_to_dto", "join_paths_ignoring_empty")
 load(":logging.bzl", "warn")
-load(":providers.bzl", "InputFileAttributesInfo")
 
 # Utility
 
@@ -38,8 +38,10 @@ def _collect_transitive_extra_files(info):
         transitive.append(inputs.hdrs)
     return transitive
 
-def _should_include_transitive_resources(*, info):
-    return not info.target or not info.target.is_bundle
+def _should_include_transitive_resources(*, attrs_info, attr, info):
+    return ((not info.target or not info.target.is_bundle) and
+            (not attrs_info or
+             attrs_info.resources.get(attr) == info.target_type))
 
 def _should_ignore_attr(attr, *, excluded_attrs):
     return (
@@ -88,7 +90,7 @@ in {}""".format(file, target.label))
     if not ext:
         fail("Expected file.path %r to contain %r, but it did not" % (
             file,
-            ".bundle"
+            ".bundle",
         ))
 
     relative_bundle = prefix + ext
@@ -164,7 +166,7 @@ def _collect(
                 non_arc_srcs.append(file)
             elif attr in attrs_info.hdrs:
                 hdrs.append(file)
-            elif attr in attrs_info.resources:
+            elif attrs_info.resources.get(attr):
                 fp = file_path(file)
                 if owner:
                     resources.append((owner, fp))
@@ -229,7 +231,12 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
         None if owner else unowned_resources,
         transitive = [
             info.inputs._unowned_resources
-            for _, info in transitive_infos
+            for attr, info in transitive_infos
+            if _should_include_transitive_resources(
+                attrs_info = attrs_info,
+                attr = attr,
+                info = info,
+            )
         ],
     )
     if owner:
@@ -245,7 +252,12 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
             [owner] if owner else None,
             transitive = [
                 info.inputs._resource_owners
-                for _, info in transitive_infos
+                for attr, info in transitive_infos
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = info,
+                )
             ],
         ),
         srcs = depset(srcs),
@@ -255,8 +267,12 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
             resources,
             transitive = [
                 info.inputs.resources
-                for _, info in transitive_infos
-                if _should_include_transitive_resources(info = info)
+                for attr, info in transitive_infos
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = info,
+                )
             ],
         ),
         generated = depset(
@@ -275,7 +291,7 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
         ),
     )
 
-def _merge(*, transitive_infos):
+def _merge(*, attrs_info, transitive_infos):
     """Creates merged inputs.
 
     Args:
@@ -292,13 +308,23 @@ def _merge(*, transitive_infos):
         _unowned_resources = depset(
             transitive = [
                 info.inputs._unowned_resources
-                for _, info in transitive_infos
+                for attr, info in transitive_infos
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = info,
+                )
             ],
         ),
         _resource_owners = depset(
             transitive = [
                 info.inputs._resource_owners
-                for _, info in transitive_infos
+                for attr, info in transitive_infos
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = info,
+                )
             ],
         ),
         srcs = depset(),
@@ -307,8 +333,12 @@ def _merge(*, transitive_infos):
         resources = depset(
             transitive = [
                 info.inputs.resources
-                for _, info in transitive_infos
-                if _should_include_transitive_resources(info = info)
+                for attr, info in transitive_infos
+                if _should_include_transitive_resources(
+                    attrs_info = attrs_info,
+                    attr = attr,
+                    info = info,
+                )
             ],
         ),
         generated = depset(
