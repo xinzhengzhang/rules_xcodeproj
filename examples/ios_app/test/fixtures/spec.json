@@ -11,6 +11,7 @@
         "USE_HEADERMAP": false
     },
     "extra_files": [
+        "ExampleNestedResources/Info.plist",
         "ExampleResources/Info.plist",
         "third_party/ExampleFramework.framework/ExampleFramework",
         "third_party/ExampleFramework.framework/Headers/ExampleFramework-Swift.h",
@@ -125,14 +126,6 @@
             "_": "ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd/bin/Utils/Utils.swift.modulemap",
             "t": "g"
         },
-        "Example/Assets.xcassets/AppIcon.appiconset/Contents.json",
-        "Example/Assets.xcassets/AppIcon.appiconset/ios_2x_icon-1.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ios_2x_icon.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ios_3x_icon.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ios_store_icon.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ipad_1x_icon.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ipad_2x_icon.png",
-        "Example/Assets.xcassets/AppIcon.appiconset/ipadpro_2x_icon.png",
         "Example/Info.plist",
         "TestingUtils/Greeting.swift.stencil",
         "TestingUtils/Answer.swift.stencil",
@@ -392,6 +385,7 @@
                 "type": "com.apple.product-type.application"
             },
             "resource_bundles": [
+                "bazel-out/ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd/bin/ExampleNestedResources/ExampleNestedResources.bundle",
                 "bazel-out/ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd/bin/ExampleResources/ExampleResources.bundle"
             ],
             "search_paths": {},
@@ -523,6 +517,53 @@
                     }
                 ]
             },
+            "swiftmodules": [],
+            "test_host": null
+        },
+        "//ExampleNestedResources:ExampleNestedResources ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd",
+        {
+            "build_settings": {
+                "GENERATE_INFOPLIST_FILE": true,
+                "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
+                "PRODUCT_BUNDLE_IDENTIFIER": "com.example.resources.nested",
+                "PRODUCT_NAME": "ExampleNestedResources"
+            },
+            "configuration": "ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd",
+            "dependencies": [],
+            "frameworks": [],
+            "inputs": {
+                "resources": [
+                    "ExampleNestedResources/Assets.xcassets/Contents.json",
+                    "ExampleNestedResources/Assets.xcassets/rules_xcodeproj.imageset/Contents.json",
+                    "ExampleNestedResources/Assets.xcassets/rules_xcodeproj.imageset/rules_xcodeproj.png",
+                    "ExampleNestedResources/en.lproj/Localizable.strings",
+                    "ExampleNestedResources/es.lproj/Localizable.strings",
+                    {
+                        "_": "ExampleNestedResources/dir",
+                        "f": true
+                    }
+                ]
+            },
+            "is_swift": false,
+            "label": "//ExampleNestedResources:ExampleNestedResources",
+            "links": [],
+            "modulemaps": [],
+            "name": "ExampleNestedResources",
+            "outputs": {},
+            "package_bin_dir": "bazel-out/ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd/bin/ExampleNestedResources",
+            "platform": {
+                "arch": "x86_64",
+                "environment": "Simulator",
+                "minimum_os_version": "15.0",
+                "os": "ios"
+            },
+            "product": {
+                "name": "ExampleNestedResources",
+                "path": "bazel-out/ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd/bin/ExampleNestedResources/ExampleNestedResources.bundle",
+                "type": "com.apple.product-type.bundle"
+            },
+            "resource_bundles": [],
+            "search_paths": {},
             "swiftmodules": [],
             "test_host": null
         },
@@ -735,7 +776,9 @@
                 "PRODUCT_NAME": "ExampleResources"
             },
             "configuration": "ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd",
-            "dependencies": [],
+            "dependencies": [
+                "//ExampleNestedResources:ExampleNestedResources ios-x86_64-min15.0-applebin_ios-ios_x86_64-fastbuild-ST-d3e756bfe7fd"
+            ],
             "frameworks": [],
             "inputs": {
                 "resources": [

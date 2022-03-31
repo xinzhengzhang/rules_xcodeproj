@@ -436,6 +436,110 @@ def _process_test_host(test_host):
         return test_host[XcodeProjInfo]
     return None
 
+_PROCESSED_PROPERTIES = [
+    "asset_catalogs",
+    "datamodels",
+    "metals",
+    "mlmodels",
+    "plists",
+    "pngs",
+    "processed",
+    "storyboards",
+    "strings",
+    "texture_atlases",
+    "xibs",
+]
+
+def _process_resource_info(resource_info, *, target):
+    results = {}
+
+    def _create_bundle():
+        return struct(
+            resources = [],
+            structured_resources = [],
+            dependencies = [],
+        )
+
+    root_bundle = _create_bundle()
+    resource_bundle_targets = {}
+    generated = []
+    def _process_resource(file):
+        if not file.is_source:
+            generated.append(file)
+        return file_path(file)
+
+    def _add_resouces_to_bundle(bundle, files):
+        file_paths = [_process_resource(file) for file in files.to_list()]
+        bundle.resources.extend(file_paths)
+
+    def _add_structured_resources_to_bundle(bundle, nested_path, files):
+        file_paths = [_process_resource(file) for file in files.to_list()]
+        bundle.structured_resources.append(struct(path = nested_path, files = file_paths))
+    def _add_structured_resources(bundle_path, nested_path, files):
+        bundle = resource_bundle_targets.get(bundle_path)
+        if bundle:
+            _add_structured_resources_to_bundle(bundle, nested_path, files)
+            resource_bundle_targets[bundle_path] = bundle
+        else:
+            _add_structured_resources_to_bundle(root_bundle, join_paths_ignoring_empty(bundle_path, nested_path), files)
+
+    for property in _PROCESSED_PROPERTIES:
+        for parent_dir, _, files in getattr(resource_info, property, []):
+            if not parent_dir:
+                _add_resouces_to_bundle(root_bundle, files)
+                continue
+
+            prefix, ext, _ = parent_dir.rpartition(".bundle")
+            if not ext:
+                _add_resouces_to_bundle(root_bundle, files)
+                continue
+
+            bundle_path = prefix + ext
+            bundle = resource_bundle_targets.get(bundle_path, _create_bundle())
+            _add_resouces_to_bundle(bundle, files)
+            resource_bundle_targets[bundle_path] = bundle
+
+    for parent_dir, _, files in resource_info.unprocessed:
+        if not parent_dir:
+            continue
+        prefix, ext, _ = parent_dir.rpartition(".bundle")
+        if ext:
+            bundle_path = prefix + ext
+            nested_path = parent_dir[len(bundle_path) + 1:]
+        else:
+            bundle_path = None
+            nested_path = parent_dir
+        _add_structured_resources(bundle_path, nested_path, files)
+
+    paths_by_bundle_json = {}
+    bundle_by_bundle_json = {}
+    for bundle_path, bundle in resource_bundle_targets.items():
+        bundle_json = json.encode(bundle)
+        paths = paths_by_bundle_json.get(bundle_json, [])
+        paths.append(bundle_path)
+        paths_by_bundle_json[bundle_json] = paths
+        bundle_by_bundle_json[bundle_json] = bundle
+
+    output_bundles = []
+    for bundle_json, paths in paths_by_bundle_json.items():
+        output_bundles.append(struct(paths = paths, bundle = bundle_by_bundle_json[bundle_json]))
+
+    parent_bundle_paths = sorted(resource_bundle_targets, reverse = True)
+    for child_bundle_path in resource_bundle_targets:
+        parent = root_bundle
+        for parent_bundle_path in parent_bundle_paths:
+            if parent_bundle_path == child_bundle_path:
+                continue
+            if child_bundle_path.startswith(parent_bundle_path):
+                parent = resource_bundle_targets[parent_bundle_path]
+                break
+        parent.dependencies.append(child_bundle_path)
+
+    results["output_bundles"] = output_bundles
+    results["root_bundle"] = root_bundle
+
+    print("\n{}\nPROCESSED_RESOURCE_INFO\n{}\nGenerated: {}".format(target.label, json.encode_indent(results), generated))
+
 def _process_top_level_target(*, ctx, target, bundle_info, transitive_infos):
     """Gathers information about a top-level target.
 
@@ -450,6 +554,21 @@ def _process_top_level_target(*, ctx, target, bundle_info, transitive_infos):
         The value returned from `_processed_target()`.
     """
     attrs_info = target[InputFileAttributesInfo]
+
+    # if str(target.label) == "//Example:Example":
+    if bundle_info:
+        # print(target[AppleResourceInfo])
+        _process_resource_info(target[AppleResourceInfo], target = target)
+        # for attr in dir(ctx.rule.attr):
+        #     value = getattr(ctx.rule.attr, attr)
+        #     if type(value) != "list":
+        #         continue
+        #     for dep in value:
+        #         if type(dep) != "Target":
+        #             continue
+        #         if AppleResourceInfo not in dep:
+        #             continue
+        #         print(attr, dep[AppleResourceInfo])
 
     configuration = _get_configuration(ctx)
     label = target.label

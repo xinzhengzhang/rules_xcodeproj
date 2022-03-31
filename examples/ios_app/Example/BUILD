@@ -11,26 +11,26 @@ config_setting(
 
 ios_application(
     name = "Example",
-    app_icons = glob(["Assets.xcassets/AppIcon.appiconset/**"]),
+    # app_icons = glob(["Assets.xcassets/AppIcon.appiconset/**"]),
     bundle_id = "io.buildbuddy.example",
     bundle_name = "Example",
     families = ["iphone"],
     infoplists = [":Info.plist"],
     minimum_os_version = "15.0",
-    resources = [":ExampleResourceGroup"],
-    visibility = ["//visibility:public"],
-    deps = [":Example.library"],
-)
-
-apple_resource_group(
-    name = "ExampleResourceGroup",
-    resources = glob(
+    resources = [":ExampleResourceGroup"] + glob(
         [
             "Assets.xcassets/**",
             "*.lproj/**",
         ],
         exclude = ["Assets.xcassets/AppIcon.appiconset/**"],
     ),
+    visibility = ["//visibility:public"],
+    deps = [":Example.library"],
+)
+
+apple_resource_group(
+    name = "ExampleResourceGroup",
+    resources = ["//ExampleNestedResources"],
     structured_resources = ["nested/answer.txt"],
 )
 

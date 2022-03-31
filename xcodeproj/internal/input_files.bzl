@@ -87,12 +87,9 @@ Bundle import paths must come from the same package as the target. {} is not \
 in {}""".format(file, target.label))
 
     relative_path = path[len(package_dir) + 1:]
-    prefix, ext, _ = relative_path.partition(".bundle")
+    prefix, ext, _ = relative_path.rpartition(".bundle")
     if not ext:
-        fail("Expected file.path %r to contain %r, but it did not" % (
-            file,
-            ".bundle",
-        ))
+        fail("Expected file.path %r to contain .bundle, but it did not" % file)
 
     relative_bundle = prefix + ext
 
