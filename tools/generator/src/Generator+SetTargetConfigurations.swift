@@ -75,15 +75,14 @@ Target "\(id)" not found in `pbxTargets`.
             }
 
             try targetBuildSettings.prepend(
-                onKey: "OTHER_SWIFT_FLAGS",
+                onKey: "OTHER_CFLAGS",
                 target.modulemaps
                     .map { filePath -> String in
                         let modulemap = filePathResolver
                             .resolve(filePath)
                             .string.quoted
-                        return "-Xcc -fmodule-map-file=\(modulemap)"
+                        return "-fmodule-map-file=\(modulemap)"
                     }
-                    .joined(separator: " ")
             )
 
             if !target.links.isEmpty {
