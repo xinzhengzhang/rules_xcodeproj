@@ -92,7 +92,7 @@ def _write_json_spec(*, ctx, project_name, inputs, infos):
 
     return output
 
-def _write_xcodeproj(*, ctx, project_name, spec_file, build_mode):
+def _write_xcodeproj(*, ctx, project_name, spec_file, stubs, build_mode):
     xcodeproj = ctx.actions.declare_directory(
         "{}.xcodeproj".format(ctx.attr.name),
     )
@@ -106,6 +106,7 @@ def _write_xcodeproj(*, ctx, project_name, spec_file, build_mode):
 
     args = ctx.actions.args()
     args.add(spec_file.path)
+    args.add(stubs[0].dirname)
     args.add(xcodeproj.path)
     args.add(install_path)
     args.add(build_mode)
@@ -114,7 +115,7 @@ def _write_xcodeproj(*, ctx, project_name, spec_file, build_mode):
         executable = ctx.executable._generator,
         mnemonic = "GenerateXcodeProj",
         arguments = [args],
-        inputs = [spec_file],
+        inputs = [spec_file] + stubs,
         outputs = [xcodeproj],
     )
 
@@ -193,6 +194,7 @@ def _xcodeproj_impl(ctx):
         ctx = ctx,
         project_name = project_name,
         spec_file = spec_file,
+        stubs = ctx.files._stubs,
         build_mode = ctx.attr.build_mode,
     )
     installer = _write_installer(
@@ -274,6 +276,11 @@ def make_xcodeproj_rule(*, transition = None):
             allow_single_file = True,
             executable = False,
             default = Label("//xcodeproj/internal:installer.template.sh"),
+        ),
+        "_stubs": attr.label(
+            allow_files = True,
+            executable = False,
+            default = Label("//xcodeproj/internal:stubs"),
         ),
     }
 

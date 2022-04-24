@@ -9,6 +9,7 @@ load(":xcodeproj_targets.bzl", "XCODEPROJ_TARGETS")
 swift_library(
     name = "generator.library",
     srcs = glob(["src/**/*.swift"]),
+    data = glob(["data/**"]),
     module_name = "generator",
     visibility = ["//tools/generator/test:__pkg__"],
     deps = [

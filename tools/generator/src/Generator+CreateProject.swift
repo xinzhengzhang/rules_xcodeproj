@@ -41,7 +41,14 @@ $(BUILD_DIR)/bazel_build_output_groups
         }
 
         if buildMode.requiresLLDBInit {
-            buildSettings["BAZEL_LLDB_INIT"] = "$(INTERNAL_DIR)/.lldbinit"
+            buildSettings.merge([
+                "BAZEL_LLDB_INIT": "$(INTERNAL_DIR)/.lldbinit",
+                "BAZEL_STUBS_DIR": "$(INTERNAL_DIR)/stubs",
+                "CC": "$(BAZEL_STUBS_DIR)/cc.sh",
+                "LD": "$(BAZEL_STUBS_DIR)/ld.sh",
+                "LIBTOOL": "$(BAZEL_STUBS_DIR)/libtool.sh",
+                "SWIFT_EXEC": "$(BAZEL_STUBS_DIR)/swiftc.py",
+            ], uniquingKeysWith: { _, r in r })
         }
 
         let debugConfiguration = XCBuildConfiguration(

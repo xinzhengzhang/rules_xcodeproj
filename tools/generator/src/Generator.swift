@@ -39,6 +39,7 @@ class Generator {
         project: Project,
         projectRootDirectory: Path,
         internalDirectoryName: String,
+        stubsPath: Path,
         workspaceOutputPath: Path,
         outputPath: Path
     ) throws {
@@ -132,8 +133,10 @@ Was unable to merge "\(srcTarget.label) \
          let xcodeProj = environment.createXcodeProj(pbxProj)
          try environment.writeXcodeProj(
             xcodeProj,
+            buildMode,
             files,
             internalDirectoryName,
+            stubsPath,
             outputPath
          )
     }

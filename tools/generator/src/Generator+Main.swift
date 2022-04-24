@@ -17,6 +17,7 @@ extension Generator {
                 project: project,
                 projectRootDirectory: arguments.projectRootDirectory,
                 internalDirectoryName: "rules_xcodeproj",
+                stubsPath: arguments.stubsPath,
                 workspaceOutputPath: arguments.workspaceOutputPath,
                 outputPath: arguments.outputPath
             )
@@ -32,10 +33,11 @@ extension Generator {
         let workspaceOutputPath: Path
         let projectRootDirectory: Path
         let buildMode: BuildMode
+        let stubsPath: Path
     }
 
     static func parseArguments(_ arguments: [String]) throws -> Arguments {
-        guard CommandLine.arguments.count == 5 else {
+        guard CommandLine.arguments.count == 6 else {
             throw UsageError(message: """
 Usage: \(CommandLine.arguments[0]) <path/to/project.json> \
 <path/to/output/project.xcodeproj> <workspace/relative/output/path> \
@@ -43,7 +45,7 @@ Usage: \(CommandLine.arguments[0]) <path/to/project.json> \
 """)
         }
 
-        let workspaceOutput = CommandLine.arguments[3]
+        let workspaceOutput = CommandLine.arguments[4]
         let workspaceOutputComponents = workspaceOutput.split(separator: "/")
 
         // Generate a relative path to the project root
@@ -54,7 +56,7 @@ Usage: \(CommandLine.arguments[0]) <path/to/project.json> \
             .joined(separator: "/")
 
         guard
-            let buildMode = BuildMode(rawValue: CommandLine.arguments[4])
+            let buildMode = BuildMode(rawValue: CommandLine.arguments[5])
         else {
             throw UsageError(message: """
 ERROR: build_mode wasn't one of the supported values: xcode, bazel
@@ -63,10 +65,11 @@ ERROR: build_mode wasn't one of the supported values: xcode, bazel
 
         return Arguments(
             specPath: Path(CommandLine.arguments[1]),
-            outputPath: Path(CommandLine.arguments[2]),
+            outputPath: Path(CommandLine.arguments[3]),
             workspaceOutputPath: Path(workspaceOutput),
             projectRootDirectory: Path(projectRoot),
-            buildMode: buildMode
+            buildMode: buildMode,
+            stubsPath: Path(CommandLine.arguments[2])
         )
     }
 
