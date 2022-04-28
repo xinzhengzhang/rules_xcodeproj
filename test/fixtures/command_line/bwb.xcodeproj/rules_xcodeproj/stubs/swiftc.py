@@ -2,16 +2,23 @@
 
 import json
 import os
+import re
 import sys
 from typing import List
+
+# TODO: Force a compile to happen if bazel compiled the target (might require a stub source file and it might trigger all?)
+
+_SWIFT_FILES_PATTERN = r"(.*?(/Index/Build)?)/Intermediates\.noindex/.*\.build/bazel-out/([^/]+)/bin/(external/([^/]+)/)?(.*)/([^/]+)/Objects-normal/[^/]+/[^/]+$"
 
 def _main() -> None:
     if sys.argv[1:] == ["-v"]:
         os.system("swiftc -v")
         return
 
+    # TODO: Iterate over the arguments once
     _touch_deps_files(sys.argv)
     _touch_swiftmodule_artifacts(sys.argv)
+    _write_output_groups_file(sys.argv)
 
 
 def _touch_deps_files(args: List[str]) -> None:
@@ -52,6 +59,32 @@ def _touch(path: str) -> None:
 def _replace_ext(path: str, extension: str) -> str:
     name, _ = os.path.splitext(path)
     return ".".join((name, extension))
+
+def _write_output_groups_file(args: List[str]) -> None:
+    flag = args.index("-output-file-map")
+    output_file_map_path = args[flag + 1]
+
+    match = re.search(_SWIFT_FILES_PATTERN, output_file_map_path)
+    if not match:
+        print("Unable to parse paths", file=sys.stderr)
+        sys.exit(1)
+
+    if match.group(1):
+        mode = "i"
+    else:
+        mode = "b"
+
+    build_dir = match.group(1)
+    bazel_build_output_groups = f"{build_dir}/bazel_build_output_groups"
+
+    repo = match.group(4)
+    prefix = f"@{repo}//" if repo else ""
+    output_group = f"""\
+{mode} {prefix}{match.group(5)}:{match.group(6)} {match.group(2)}
+"""
+
+    with open(bazel_build_output_groups, "w", encoding = "utf8") as f:
+        f.write(output_group)
 
 
 if __name__ == "__main__":
