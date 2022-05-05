@@ -10,7 +10,7 @@ load(
     "AppleResourceInfo",
     "IosXcTestBundleInfo",
 )
-load("@build_bazel_rules_swift//swift:swift.bzl", "SwiftInfo")
+load("@build_bazel_rules_swift//swift:swift.bzl", "SwiftInfo", "SwiftProtoInfo")
 load(
     ":build_settings.bzl",
     "get_product_module_name",
@@ -965,10 +965,34 @@ def _process_non_xcode_target(*, ctx, target, transitive_infos):
     Returns:
         The value returned from `_processed_target()`.
     """
+    additional_files = []
+
     if CcInfo in target:
         linker_inputs = _get_linker_inputs(cc_info = target[CcInfo])
+        additional_files.extend(
+            _get_static_libraries(linker_inputs = linker_inputs),
+        )
     else:
         linker_inputs = depset()
+
+    if SwiftInfo in target:
+        for module in target[SwiftInfo].transitive_modules.to_list():
+            clang = module.clang
+            if clang:
+                module_map = clang.module_map
+                if module_map and type(module_map) == "File":
+                    additional_files.append(module_map)
+            swift = module.swift
+            if swift:
+                additional_files.append(swift.swiftmodule)
+                additional_files.append(swift.swiftdoc)
+                if swift.swiftinterface:
+                    additional_files.append(swift.swiftinterface)
+                if swift.swiftsourceinfo:
+                    additional_files.append(swift.swiftsourceinfo)
+
+    if SwiftProtoInfo in target:
+        additional_files.extend(target[SwiftProtoInfo].pbswift_files.to_list())
 
     attrs_info = target[InputFileAttributesInfo]
     resource_owner = None
@@ -977,6 +1001,7 @@ def _process_non_xcode_target(*, ctx, target, transitive_infos):
         target = target,
         attrs_info = attrs_info,
         owner = resource_owner,
+        additional_files = additional_files,
         transitive_infos = transitive_infos,
     )
 
@@ -1017,7 +1042,7 @@ def _process_non_xcode_target(*, ctx, target, transitive_infos):
 
 # Creating `XcodeProjInfo`
 
-def _should_become_xcode_target(target):
+def _should_become_xcode_target(target, *, transitive_infos):
     """Determines if the given target should be included in the Xcode project.
 
     Args:
@@ -1025,9 +1050,7 @@ def _should_become_xcode_target(target):
 
     Returns:
         `False` if `target` shouldn't become an actual target in the generated
-        Xcode project. Resource bundles are a current example of this, as we
-        only include their files in the project, but we don't create targets
-        for them.
+        Xcode project.
     """
 
     # Top-level bundles
@@ -1039,6 +1062,26 @@ def _should_become_xcode_target(target):
         # `apple_bundle_import` returns a `AppleResourceBundleInfo` and also
         # a `AppleResourceInfo`, so we use that to exclude it
         return True
+
+    #
+    if SwiftInfo in target:
+        swift_info = target[SwiftInfo]
+        direct_modules = swift_info.direct_modules
+        transitive_modules = [
+            module.swift
+            for module in swift_info.transitive_modules.to_list()
+            if module not in direct_modules
+        ]
+        attrs_info = target[InputFileAttributesInfo]
+        a = [
+            True
+            for attr, info in transitive_infos
+            if ((not attrs_info or
+                 attrs_info.xcode_targets.get(attr) == info.target_type) and
+                (info.target or info.dependencies or info.inputs.contains_generated_files))
+        ]
+        if transitive_modules and not a:
+            return False
 
     # Libraries
     # Targets that don't produce files are ignored (e.g. imports)
@@ -1404,7 +1447,10 @@ def _process_target(*, ctx, target, transitive_infos):
         A `dict` of fields to be merged into the `XcodeProjInfo`. See
         `_target_info_fields()`.
     """
-    if not _should_become_xcode_target(target):
+    if not _should_become_xcode_target(
+        target,
+        transitive_infos = transitive_infos,
+    ):
         processed_target = _process_non_xcode_target(
             ctx = ctx,
             target = target,

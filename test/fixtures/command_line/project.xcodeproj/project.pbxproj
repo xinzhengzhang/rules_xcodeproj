@@ -37,6 +37,13 @@
 			remoteGlobalIDString = 3064A34776444DE49627998E;
 			remoteInfo = "Bazel Generated Files";
 		};
+		AA92875262A341379A069EF4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 90B40B411875CA87718F15D6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3064A34776444DE49627998E;
+			remoteInfo = "Bazel Generated Files";
+		};
 		C8D84219C50F3654639EFA28 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 90B40B411875CA87718F15D6 /* Project object */;
@@ -54,7 +61,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0E268EB0162EDF44EF7723FF /* liblib_swift.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblib_swift.a; sourceTree = "<group>"; };
 		1704EC3DF20D136B9D2B8C0D /* liblib_impl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblib_impl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DC8E0081E117CEF516C7E36 /* liblib_impl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblib_impl.a; sourceTree = "<group>"; };
 		4EADE140455A0D9F51FEA180 /* liblib_swift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblib_swift.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		57486259156D32B2F964EF4E /* lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lib.h; sourceTree = "<group>"; };
 		600865D85986BF1EAC59E70F /* lib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lib.swift; sourceTree = "<group>"; };
@@ -169,6 +178,8 @@
 			isa = PBXGroup;
 			children = (
 				7A2C174D9E5615981EBC16AB /* lib_impl.swift.modulemap */,
+				4DC8E0081E117CEF516C7E36 /* liblib_impl.a */,
+				0E268EB0162EDF44EF7723FF /* liblib_swift.a */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -233,6 +244,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				039D5F57D9CE57D3B2E9FEB4 /* PBXTargetDependency */,
 				0459E26F2853B3A5AABC4F0D /* PBXTargetDependency */,
 			);
 			name = tool;
@@ -398,6 +410,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		039D5F57D9CE57D3B2E9FEB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Bazel Generated Files";
+			target = 3064A34776444DE49627998E /* Bazel Generated Files */;
+			targetProxy = AA92875262A341379A069EF4 /* PBXContainerItemProxy */;
+		};
 		0459E26F2853B3A5AABC4F0D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = lib_swift;
@@ -437,7 +455,6 @@
 				OTHER_CFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",
@@ -454,7 +471,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",
@@ -532,7 +548,6 @@
 				OTHER_CFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",
@@ -549,7 +564,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",
@@ -600,7 +614,6 @@
 				OTHER_CFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",
@@ -617,7 +630,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D_FORTIFY_SOURCE=1",
 					"-fstack-protector",
-					"-fcolor-diagnostics",
 					"-Wall",
 					"-Wthread-safety",
 					"-Wself-assign",

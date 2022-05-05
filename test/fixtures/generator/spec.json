@@ -40,7 +40,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -57,7 +56,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -129,7 +127,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -146,7 +143,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -255,7 +251,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -272,7 +267,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -340,7 +334,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -357,7 +350,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -469,7 +461,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -486,7 +477,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -559,7 +549,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -576,7 +565,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -752,7 +740,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -769,7 +756,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -842,7 +828,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -859,7 +844,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -948,7 +932,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -965,7 +948,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",

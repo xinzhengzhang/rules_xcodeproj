@@ -11,7 +11,15 @@
         "USE_HEADERMAP": false
     },
     "extra_files": [
+        {
+            "_": "darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/examples/cc/lib/liblib_impl.a",
+            "t": "g"
+        },
         "examples/cc/lib/lib.h",
+        {
+            "_": "darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/external/examples_cc_external/liblib_impl.a",
+            "t": "g"
+        },
         {
             "_": "examples_cc_external/lib.h",
             "t": "e"
@@ -32,7 +40,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -49,7 +56,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -123,7 +129,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -140,7 +145,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -218,7 +222,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -235,7 +238,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -267,6 +269,7 @@
             "frameworks": [],
             "info_plist": null,
             "inputs": {
+                "contains_generated_files": true,
                 "srcs": [
                     "examples/cc/tool/main.c"
                 ]
@@ -334,7 +337,6 @@
                 "OTHER_CFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",
@@ -351,7 +353,6 @@
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-D_FORTIFY_SOURCE=1",
                     "-fstack-protector",
-                    "-fcolor-diagnostics",
                     "-Wall",
                     "-Wthread-safety",
                     "-Wself-assign",

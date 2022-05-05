@@ -1,0 +1,9 @@
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/external/com_github_apple_swift_protobuf/libSwiftProtobuf.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/external/com_github_pointfreeco_swift_custom_dump/libCustomDump.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/external/com_github_pointfreeco_xctest_dynamic_overlay/libXCTestDynamicOverlay.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/bep/libbuild_event_stream_proto.swift.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/bep/libcommand_line_proto.swift.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/bep/libfailure_details_proto.swift.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/bep/libinvocation_policy_proto.swift.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/bep/liboption_filters_proto.swift.a
+bazel-out/darwin_x86_64-fastbuild-ST-d53d69b6b8c1/bin/tools/bep_parser/libbep_parser.library.a

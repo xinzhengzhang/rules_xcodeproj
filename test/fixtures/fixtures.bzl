@@ -4,6 +4,7 @@ FIXTURE_BASENAMES = [
     "cc",
     "command_line",
     "generator",
+    "bep_parser",
 ]
 
 _FIXTURE_PACKAGES = ["//test/fixtures/{}".format(b) for b in FIXTURE_BASENAMES]

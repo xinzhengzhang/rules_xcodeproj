@@ -244,6 +244,13 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
         ])
         unowned_resources_depset = depset()
 
+    contains_generated_files = bool(generated) or bool([
+        True
+        for attr, info in transitive_infos
+        if (not info.target and info.inputs.contains_generated_files and (not attrs_info or
+                                                                          attrs_info.resources.get(attr) == info.target_type))
+    ])
+
     return struct(
         _unowned_resources = unowned_resources_depset,
         _resource_owners = depset(
@@ -273,7 +280,7 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
                 )
             ],
         ),
-        contains_generated_files = bool(generated),
+        contains_generated_files = contains_generated_files,
         generated = depset(
             generated,
             transitive = [
