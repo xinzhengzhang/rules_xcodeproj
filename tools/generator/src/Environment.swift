@@ -55,10 +55,10 @@ struct Environment {
     let addBazelDependenciesTarget: (
         _ pbxProj: PBXProj,
         _ buildMode: BuildMode,
-        _ files: [FilePath: File],
-        _ filePathResolver: FilePathResolver,
         _ xcodeprojBazelLabel: String,
-        _ xcodeprojConfiguration: String
+        _ xcodeprojConfiguration: String,
+        _ files: [FilePath: File],
+        _ filePathResolver: FilePathResolver
     ) throws -> PBXAggregateTarget?
 
     let addTargets: (

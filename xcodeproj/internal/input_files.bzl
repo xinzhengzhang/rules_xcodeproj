@@ -116,6 +116,7 @@ def _collect(
         *,
         ctx,
         target,
+        id,
         bundle_resources,
         attrs_info,
         owner,
@@ -126,6 +127,7 @@ def _collect(
     Args:
         ctx: The aspect context.
         target: The `Target` to collect inputs from.
+        id: The unique identifier of the target.
         bundle_resources: Whether resources will be bundled in the generated
             project. If this is `False` then all resources will get added to
             `extra_files` instead of `resources`.
@@ -279,6 +281,17 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
         ])
         unowned_resources_depset = depset()
 
+    transitive_generated = depset(
+        generated,
+        transitive = [
+            info.inputs.generated
+            for attr, info in transitive_infos
+            if (not attrs_info or
+                info.target_type in
+                attrs_info.xcode_targets.get(attr, [None]))
+        ],
+    )
+
     return struct(
         _unowned_resources = unowned_resources_depset,
         _resource_owners = depset(
@@ -291,6 +304,16 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
                     attr = attr,
                     info = info,
                 )
+            ],
+        ),
+        _output_group_list = depset(
+            [("g {}".format(id), transitive_generated)] if id else None,
+            transitive = [
+                info.inputs._output_group_list
+                for attr, info in transitive_infos
+                if (not attrs_info or
+                    info.target_type in
+                    attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
         srcs = depset(srcs),
@@ -319,16 +342,7 @@ https://github.com/buildbuddy-io/rules_xcodeproj/issues/new?template=bug.md
                     attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
-        generated = depset(
-            generated,
-            transitive = [
-                info.inputs.generated
-                for attr, info in transitive_infos
-                if (not attrs_info or
-                    info.target_type in
-                    attrs_info.xcode_targets.get(attr, [None]))
-            ],
-        ),
+        generated = transitive_generated,
         extra_files = depset(
             extra_files,
             transitive = flatten([
@@ -375,6 +389,15 @@ def _merge(*, attrs_info, transitive_infos):
                     attr = attr,
                     info = info,
                 )
+            ],
+        ),
+        _output_group_list = depset(
+            transitive = [
+                info.inputs._output_group_list
+                for attr, info in transitive_infos
+                if (not attrs_info or
+                    info.target_type in
+                    attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
         srcs = depset(),
@@ -498,15 +521,25 @@ def _to_output_groups_fields(
         A `dict` where the keys are output group names and the values are
         `depset` of `File`s.
     """
-    name = "generated_inputs {}".format(configuration)
-    return {
+    fields = {
         name: depset([output_group_map.write_map(
             ctx = ctx,
-            name = name,
-            files = inputs.generated,
+            name = name.replace("/", "_"),
+            files = files,
             toplevel_cache_buster = toplevel_cache_buster,
-        )]),
+        )])
+        for name, files in inputs._output_group_list.to_list()
     }
+
+    all_generated_name = "generated_inputs {}".format(configuration)
+    fields[all_generated_name] = depset([output_group_map.write_map(
+        ctx = ctx,
+        name = all_generated_name,
+        files = inputs.generated,
+        toplevel_cache_buster = toplevel_cache_buster,
+    )])
+
+    return fields
 
 input_files = struct(
     collect = _collect,

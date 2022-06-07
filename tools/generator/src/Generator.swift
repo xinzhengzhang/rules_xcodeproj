@@ -121,10 +121,10 @@ Was unable to merge "\(srcTarget.label) \
         let bazelDependencies = try environment.addBazelDependenciesTarget(
             pbxProj,
             buildMode,
-            files,
-            filePathResolver,
             project.label,
-            project.configuration
+            project.configuration,
+            files,
+            filePathResolver
         )
         let pbxTargets = try environment.addTargets(
             pbxProj,

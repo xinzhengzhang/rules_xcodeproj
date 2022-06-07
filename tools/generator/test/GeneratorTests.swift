@@ -304,10 +304,10 @@ Was unable to merge "//:Y (a1b2c)" into "//:Z (1a2b3)"
         struct AddBazelDependenciesTargetCalled: Equatable {
             let pbxProj: PBXProj
             let buildMode: BuildMode
-            let files: [FilePath: File]
-            let filePathResolver: FilePathResolver
             let xcodeprojBazelLabel: String
             let xcodeprojConfiguration: String
+            let files: [FilePath: File]
+            let filePathResolver: FilePathResolver
         }
 
         var addBazelDependenciesTargetCalled: [AddBazelDependenciesTargetCalled]
@@ -315,18 +315,18 @@ Was unable to merge "//:Y (a1b2c)" into "//:Z (1a2b3)"
         func addBazelDependenciesTarget(
             in pbxProj: PBXProj,
             buildMode: BuildMode,
-            files: [FilePath: File],
-            filePathResolver: FilePathResolver,
             xcodeprojBazelLabel: String,
-            xcodeprojConfiguration: String
+            xcodeprojConfiguration: String,
+            files: [FilePath: File],
+            filePathResolver: FilePathResolver
         ) throws -> PBXAggregateTarget? {
             addBazelDependenciesTargetCalled.append(.init(
                 pbxProj: pbxProj,
                 buildMode: buildMode,
-                files: files,
-                filePathResolver: filePathResolver,
                 xcodeprojBazelLabel: xcodeprojBazelLabel,
-                xcodeprojConfiguration: xcodeprojConfiguration
+                xcodeprojConfiguration: xcodeprojConfiguration,
+                files: files,
+                filePathResolver: filePathResolver
             ))
             return bazelDependenciesTarget
         }
@@ -335,10 +335,10 @@ Was unable to merge "//:Y (a1b2c)" into "//:Z (1a2b3)"
             AddBazelDependenciesTargetCalled(
                 pbxProj: pbxProj,
                 buildMode: buildMode,
-                files: files,
-                filePathResolver: filePathResolver,
                 xcodeprojBazelLabel: project.label,
-                xcodeprojConfiguration: project.configuration
+                xcodeprojConfiguration: project.configuration,
+                files: files,
+                filePathResolver: filePathResolver
             ),
         ]
 

@@ -142,6 +142,7 @@ def process_library_target(*, ctx, target, transitive_infos):
     inputs = input_files.collect(
         ctx = ctx,
         target = target,
+        id = id,
         bundle_resources = bundle_resources,
         attrs_info = attrs_info,
         owner = resource_owner,

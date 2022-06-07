@@ -19,6 +19,9 @@ extension Generator {
 
         var buildSettings = project.buildSettings.asDictionary
         buildSettings.merge([
+            "BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE": """
+$(BUILD_DIR)/bazel_build_generated_output_groups
+""",
             "BAZEL_EXTERNAL": "$(LINKS_DIR)/external",
             "BAZEL_OUT": "$(BUILD_DIR)/real-bazel-out",
             // `BUILT_PRODUCTS_DIR` isn't actually used by the build, since

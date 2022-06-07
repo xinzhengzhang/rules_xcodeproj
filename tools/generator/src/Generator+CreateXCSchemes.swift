@@ -117,23 +117,34 @@ extension Generator {
         pbxTarget: PBXTarget,
         buildableReference: XCScheme.BuildableReference
     ) -> [XCScheme.ExecutionAction] {
-        guard
-            buildMode.usesBazelModeBuildScripts
-        else {
-            return []
-        }
+        let removeOutputGroupsFile = #"""
+if [[ -s "$BAZEL_BUILD_OUTPUT_GROUPS_FILE" ]]; then
+    rm "$BAZEL_BUILD_OUTPUT_GROUPS_FILE"
+fi
+"""#
 
         let scriptText: String
         if pbxTarget is PBXNativeTarget {
+            let handleOutputGroupsFile: String
+            if buildMode.usesBazelModeBuildScripts {
+                handleOutputGroupsFile = #"""
+echo "b $BAZEL_TARGET_ID" > "$BAZEL_BUILD_OUTPUT_GROUPS_FILE"
+"""#
+            } else {
+                handleOutputGroupsFile = removeOutputGroupsFile
+            }
+
             scriptText = #"""
 mkdir -p "${BAZEL_BUILD_OUTPUT_GROUPS_FILE%/*}"
-echo "b $BAZEL_TARGET_ID" > "$BAZEL_BUILD_OUTPUT_GROUPS_FILE"
+\#(handleOutputGroupsFile)
+echo "g $BAZEL_TARGET_ID" > "$BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE"
 
 """#
         } else {
             scriptText = #"""
-if [[ -s "$BAZEL_BUILD_OUTPUT_GROUPS_FILE" ]]; then
-    rm "$BAZEL_BUILD_OUTPUT_GROUPS_FILE"
+\#(removeOutputGroupsFile)
+if [[ -s "$BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE" ]]; then
+    rm "$BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE"
 fi
 
 """#

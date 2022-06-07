@@ -26,10 +26,10 @@ env -i \
     static func addBazelDependenciesTarget(
         in pbxProj: PBXProj,
         buildMode: BuildMode,
-        files: [FilePath: File],
-        filePathResolver: FilePathResolver,
         xcodeprojBazelLabel: String,
-        xcodeprojConfiguration: String
+        xcodeprojConfiguration: String,
+        files: [FilePath: File],
+        filePathResolver: FilePathResolver
     ) throws -> PBXAggregateTarget? {
         guard
             files.containsExternalFiles || files.containsGeneratedFiles
@@ -57,17 +57,36 @@ env -i \
         )
         pbxProj.add(object: configurationList)
 
+        // TODO: Make a `BazelLabel` type and use `.name` here
+        let xcodeprojBazelTargetName = String(
+            xcodeprojBazelLabel.split(separator: ":")[1]
+        )
+
+        let xcodeprojBinDir = calculateBinDir(
+            xcodeprojBazelLabel: xcodeprojBazelLabel,
+            xcodeprojConfiguration: xcodeprojConfiguration
+        )
+        let generatedInputsOutputGroup = #"""
+generated_inputs \#(xcodeprojConfiguration)
+"""#
+
         let bazelBuildScript = try createBazelBuildScript(
             in: pbxProj,
             buildMode: buildMode,
-            files: files,
-            filePathResolver: filePathResolver,
             xcodeprojBazelLabel: xcodeprojBazelLabel,
-            xcodeprojConfiguration: xcodeprojConfiguration
+            xcodeprojBazelTargetName: xcodeprojBazelTargetName,
+            xcodeprojBinDir: xcodeprojBinDir,
+            generatedInputsOutputGroup: generatedInputsOutputGroup,
+            files: files,
+            filePathResolver: filePathResolver
         )
 
         let copyFilesScript = try createCopyFilesScript(
             in: pbxProj,
+            buildMode: buildMode,
+            xcodeprojBazelTargetName: xcodeprojBazelTargetName,
+            xcodeprojBinDir: xcodeprojBinDir,
+            generatedInputsOutputGroup: generatedInputsOutputGroup,
             files: files,
             filePathResolver: filePathResolver
         )
@@ -110,10 +129,12 @@ env -i \
     private static func createBazelBuildScript(
         in pbxProj: PBXProj,
         buildMode: BuildMode,
-        files: [FilePath: File],
-        filePathResolver: FilePathResolver,
         xcodeprojBazelLabel: String,
-        xcodeprojConfiguration: String
+        xcodeprojBazelTargetName: String,
+        xcodeprojBinDir: String,
+        generatedInputsOutputGroup: String,
+        files: [FilePath: File],
+        filePathResolver: FilePathResolver
     ) throws -> PBXShellScriptBuildPhase {
         let hasGeneratedFiles = files.containsGeneratedFiles
 
@@ -140,19 +161,6 @@ env -i \
             name = "Fetch External Repositories"
         }
 
-        // TODO: Make a `BazelLabel` type and use `.name` here
-        let xcodeprojBazelTargetName = String(
-            xcodeprojBazelLabel.split(separator: ":")[1]
-        )
-
-        let xcodeprojBinDir = calculateBinDir(
-            xcodeprojBazelLabel: xcodeprojBazelLabel,
-            xcodeprojConfiguration: xcodeprojConfiguration
-        )
-        let generatedInputsOutputGroup = #"""
-generated_inputs \#(xcodeprojConfiguration)
-"""#
-
         let shellScript = [
             bazelSetupCommand(buildMode: buildMode),
             try createGeneratedFileDirectoriesCommand(
@@ -167,6 +175,7 @@ generated_inputs \#(xcodeprojConfiguration)
                 generatedInputsOutputGroup: generatedInputsOutputGroup
             ),
             try createCheckGeneratedFilesCommand(
+                buildMode: buildMode,
                 xcodeprojBazelTargetName: xcodeprojBazelTargetName,
                 xcodeprojBinDir: xcodeprojBinDir,
                 generatedInputsOutputGroup: generatedInputsOutputGroup,
@@ -272,30 +281,32 @@ ln -sfn "$PROJECT_DIR" SRCROOT
         xcodeprojBinDir: String,
         generatedInputsOutputGroup: String
     ) -> String {
-        let addAdditionalOutputGroups: String
-        switch buildMode {
-        case .bazel:
-            addAdditionalOutputGroups = #"""
+        return #"""
+cd "$SRCROOT"
+
+output_groups=()
 
 # Xcode doesn't adjust `$BUILD_DIR` in scheme action scripts when building for
 # previews. So we need to look in the non-preview build directory for this file.
 output_groups_file="${BAZEL_BUILD_OUTPUT_GROUPS_FILE/\/Intermediates.noindex\/Previews\/*\/Products\///Products/}"
+generated_output_groups_file="${BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE/\/Intermediates.noindex\/Previews\/*\/Products\///Products/}"
 
 if [ -s "$output_groups_file" ]; then
   while IFS= read -r output_group; do
     output_groups+=("$output_group")
   done < "$output_groups_file"
 fi
-"""#
-        case .xcode:
-            addAdditionalOutputGroups = ""
-        }
+if [ -s "$generated_output_groups_file" ]; then
+  while IFS= read -r output_group; do
+    output_groups+=("$output_group")
+  done < "$generated_output_groups_file"
+elif [ "$ACTION" != "indexbuild" ]; then
+  # If building the `BazelDependencies` target directly, we want to create all
+  # the generated files. We don't want to do this during Index Build though,
+  # since it uses the generated files from normal builds.
+  output_groups+=("\#(generatedInputsOutputGroup)")
+fi
 
-        return #"""
-cd "$SRCROOT"
-
-output_groups=("\#(generatedInputsOutputGroup)")
-\#(addAdditionalOutputGroups)
 output_groups_flag="--output_groups=$(IFS=, ; echo "${output_groups[*]}")"
 
 if [ "${ENABLE_PREVIEWS:-}" == "YES" ]; then
@@ -377,15 +388,16 @@ done
     }
 
     private static func createCheckGeneratedFilesCommand(
+        buildMode: BuildMode,
         xcodeprojBazelTargetName: String,
         xcodeprojBinDir: String,
         generatedInputsOutputGroup: String,
         hasGeneratedFiles: Bool,
         filePathResolver: FilePathResolver
     ) throws -> String? {
-        guard hasGeneratedFiles else {
+//        guard hasGeneratedFiles && !buildMode.usesBazelModeBuildScripts else {
             return nil
-        }
+//        }
 
         let rsynclist = try filePathResolver
             .resolve(.internal(rsyncFileListPath), mode: .script)
@@ -394,7 +406,6 @@ $BAZEL_OUT/\#(xcodeprojBinDir)/\#(xcodeprojBazelTargetName)-\#(generatedInputsOu
 """#
 
         return #"""
-
 diff=$(comm -23 <(sed -e 's|^|bazel-out/|' "\#(rsynclist)" | sort) <(sort "\#(filelist)"))
 if ! [ -z "$diff" ]; then
   echo "error: The files that Bazel generated don't match what the project \#
@@ -412,6 +423,10 @@ fi
 
     private static func createCopyFilesScript(
         in pbxProj: PBXProj,
+        buildMode: BuildMode,
+        xcodeprojBazelTargetName: String,
+        xcodeprojBinDir: String,
+        generatedInputsOutputGroup: String,
         files: [FilePath: File],
         filePathResolver: FilePathResolver
     ) throws -> PBXShellScriptBuildPhase? {
@@ -431,8 +446,21 @@ fi
                     .resolve(.internal(copiedGeneratedFileListPath))
                     .string,
             ],
+            shellPath: "/bin/bash",
             shellScript: #"""
 set -euo pipefail
+
+output_groups=()
+if [ -s "$BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE" ]; then
+  while IFS= read -r output_group; do
+    output_groups+=("$output_group")
+  done < "$BAZEL_BUILD_GENERATED_OUTPUT_GROUPS_FILE"
+elif [ "$ACTION" != "indexbuild" ]; then
+  # If building the `BazelDependencies` target directly, we want to create all
+  # the generated files. We don't want to do this during Index Build though,
+  # since it uses the generated files from normal builds.
+  output_groups+=("\#(generatedInputsOutputGroup)")
+fi
 
 cd "$BAZEL_OUT"
 
@@ -441,16 +469,18 @@ cd "$BAZEL_OUT"
 # "$GEN_DIR" version, so indexing might get messed up until they are normally
 # generated. It's the best we can do though as we need to use the `gen_dir`
 # symlink.
-rsync \
-  --files-from "\#(
-    try filePathResolver
-        .resolve(.internal(rsyncFileListPath), mode: .script)
-        .string
-)" \
-  --chmod=u+w \
-  -L \
-  . \
-  "$BUILD_DIR/bazel-out"
+for output_group in "${output_groups[@]}"; do
+  filelist="\#(xcodeprojBazelTargetName)-${output_group//\//_}"
+  filelist="${filelist/#/$BAZEL_OUT/\#(xcodeprojBinDir)/}"
+  filelist="${filelist/%/.filelist}"
+
+  rsync \
+    --files-from <(sed -e 's|^bazel-out/||' "$filelist") \
+    --chmod=u+w \
+    -L \
+    . \
+    "$BUILD_DIR/bazel-out"
+done
 
 """#,
             showEnvVarsInLog: false
