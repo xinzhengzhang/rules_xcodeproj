@@ -173,6 +173,7 @@ def _to_dto(linker_inputs):
     avoid_linker_inputs = linker_inputs._avoid_linker_inputs
 
     if objc:
+        linkopts = objc.linkopt
         if avoid_linker_inputs:
             if not avoid_linker_inputs._objc:
                 fail("""\
@@ -231,6 +232,7 @@ def _to_dto(linker_inputs):
         else:
             avoid_libraries = sets.make()
 
+        linkopts = []
         dynamic_frameworks = []
         static_frameworks = []
         static_libraries = [
@@ -248,6 +250,7 @@ def _to_dto(linker_inputs):
     set_if_true(ret, "dynamic_frameworks", dynamic_frameworks)
     set_if_true(ret, "static_frameworks", static_frameworks)
     set_if_true(ret, "static_libraries", static_libraries)
+    set_if_true(ret, "linkopts", linkopts)
 
     return ret
 
