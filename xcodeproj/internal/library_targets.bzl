@@ -12,7 +12,7 @@ load(
     "join_paths_ignoring_empty",
 )
 load(":input_files.bzl", "input_files")
-load(":linker_input_files.bzl", "linker_input_files")
+load(":linking.bzl", "linker_input_files")
 load(":opts.bzl", "process_opts")
 load(":output_files.bzl", "output_files")
 load(":platform.bzl", "process_platform")

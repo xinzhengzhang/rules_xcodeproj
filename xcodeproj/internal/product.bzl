@@ -5,7 +5,7 @@ load(
     "file_path",
     "file_path_to_dto",
 )
-load(":linker_input_files.bzl", "linker_input_files")
+load(":linking.bzl", "linker_input_files")
 
 def process_product(
         *,

@@ -9,7 +9,7 @@ load(
     "parsed_file_path",
 )
 load(":input_files.bzl", "input_files")
-load(":linker_input_files.bzl", "linker_input_files")
+load(":linking.bzl", "linker_input_files")
 load(":opts.bzl", "create_opts_search_paths")
 load(":output_files.bzl", "output_files")
 load(":platform.bzl", "process_platform")

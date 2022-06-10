@@ -2,7 +2,7 @@
 
 load(":files.bzl", "file_path_to_dto")
 load(":input_files.bzl", "input_files")
-load(":linker_input_files.bzl", "linker_input_files")
+load(":linking.bzl", "linker_input_files")
 load(":output_files.bzl", "output_files")
 load(":product.bzl", "product_to_dto")
 load(":providers.bzl", "target_type")

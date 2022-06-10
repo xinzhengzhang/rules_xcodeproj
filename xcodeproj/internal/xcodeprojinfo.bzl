@@ -7,7 +7,7 @@ load(
 )
 load(":input_files.bzl", "input_files")
 load(":library_targets.bzl", "process_library_target")
-load(":linker_input_files.bzl", "linker_input_files")
+load(":linking.bzl", "linker_input_files")
 load(
     ":non_xcode_targets.bzl",
     "process_non_xcode_target",
