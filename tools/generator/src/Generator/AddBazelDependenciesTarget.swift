@@ -241,6 +241,8 @@ elif [ "${ENABLE_PREVIEWS:-}" == "YES" ]; then
   # We use a different output base for SwiftUI Previews since they have
   # different swiftcopts, preventing output trashing
   output_base="$OBJROOT/bazel_output_base"
+else
+  output_base="$OBJROOT/bazel_output_base"
 fi
 
 if [[ "${COLOR_DIAGNOSTICS:-NO}" == "YES" ]]; then
