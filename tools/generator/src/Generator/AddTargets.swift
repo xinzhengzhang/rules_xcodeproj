@@ -112,6 +112,7 @@ Product for target "\(key)" not found in `products`
         outputs: ConsolidatedTargetOutputs,
         filePathResolver: FilePathResolver
     ) throws -> PBXShellScriptBuildPhase? {
+        return nil
         guard
             buildMode.usesBazelModeBuildScripts,
             let copyCommand = try outputs.scriptCopyCommand(
@@ -133,7 +134,7 @@ Product for target "\(key)" not found in `products`
         let script = PBXShellScriptBuildPhase(
             name: "Copy Bazel Outputs",
             inputPaths: inputPaths,
-            outputPaths: outputs.outputPaths,
+            outputPaths: [],
             shellScript: copyCommand,
             showEnvVarsInLog: false,
             alwaysOutOfDate: true
@@ -505,10 +506,6 @@ private extension ConsolidatedTargetLinkerInputs {
 
 private extension ConsolidatedTargetOutputs {
     func forcedBazelCompileFiles(buildMode: BuildMode) -> Set<FilePath> {
-        if buildMode.usesBazelModeBuildScripts && hasSwiftOutputs {
-            return [.internal(Generator.bazelForcedSwiftCompilePath)]
-        }
-
         return []
     }
 
