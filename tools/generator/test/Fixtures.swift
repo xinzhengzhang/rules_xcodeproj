@@ -69,7 +69,7 @@ enum Fixtures {
                 "Z": .string("0")
             ],
             swiftmodules: [.generated("x/y.swiftmodule")],
-            resourceBundles: [.generated("r1/R1.bundle")],
+            resourceBundleDependencies: ["R 1"],
             inputs: .init(
                 resources: [
                     "es.lproj/Localized.strings",
