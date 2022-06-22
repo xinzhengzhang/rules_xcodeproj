@@ -38,8 +38,9 @@ def _create(
             direct_index.append(swift.swiftdoc)
             direct_build.append(swift.swiftmodule)
             direct_index.append(swift.swiftmodule)
-            direct_build.append(swift.swiftsourceinfo)
-            direct_index.append(swift.swiftsourceinfo)
+            if swift.swiftsourceinfo:
+                direct_build.append(swift.swiftsourceinfo)
+                direct_index.append(swift.swiftsourceinfo)
             if swift.swiftinterface:
                 direct_build.append(swift.swiftinterface)
                 direct_index.append(swift.swiftinterface)
